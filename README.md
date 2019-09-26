@@ -23,7 +23,7 @@ Fill the parameter gaps that appear in the GUI with your own data and try to est
 ## •STEP 4.
 At this point, you will obtain a total of 3 images: 
 
-            -The original input image with an overlay of ROIs (Region of Interest) labeled and displayed which are resulted from the                  number of selected particle spots for each slice, channel or frame.
+            -The original input image with an overlay of ROIs (Region of Interest) labeled and displayed which are resulted from the number of selected particle spots for each slice, channel or frame.
             
  ![Imagen3](https://user-images.githubusercontent.com/54528366/65699095-d88a8000-e07d-11e9-9c22-7406978c0674.png)
 
