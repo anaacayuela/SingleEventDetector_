@@ -3,23 +3,19 @@ import ij.process.*;
 import ij.text.TextWindow;
 import ij.gui.*;
 import ij.plugin.frame.*;
-
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
 import java.util.*;
 import java.awt.Image;
-
 import ij.io.OpenDialog;
 import ij.macro.Interpreter;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.lang.Object;
-
 import ij.gui.*;
 import ij.process.*;
 import ij.text.*;
@@ -29,7 +25,6 @@ import ij.plugin.filter.*;
 import ij.util.Tools;
 import ij.macro.Interpreter;
 import ij.macro.MacroRunner;
-
 import java.awt.*;
 import java.awt.image.*;
 import ij.*;
@@ -90,17 +85,14 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		int xF=xi+boxN*particleDiameter;//final
 		int y0=yi-boxN*particleDiameter;
 		int yF=yi+boxN*particleDiameter;
-		if (x0>=0 && y0>=0 && xF<dim[0] && yF<dim[1])
-			
+		if (x0>=0 && y0>=0 && xF<dim[0] && yF<dim[1])	
 		{
-			
 			impbSelected.setRoi(x0,y0,boxSize,boxSize);
 			return impbSelected.crop().getProcessor();
 		}
 		else
 			return null;
 	}
-	
 	public boolean evaluateParticle(float xif, float yif)
 	{
 		ImageProcessor piece=cropParticle(impbFiltered,xif,yif);
