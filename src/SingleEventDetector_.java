@@ -85,14 +85,17 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		int xF=xi+boxN*particleDiameter;//final
 		int y0=yi-boxN*particleDiameter;
 		int yF=yi+boxN*particleDiameter;
-		if (x0>=0 && y0>=0 && xF<dim[0] && yF<dim[1])	
+		if (x0>=0 && y0>=0 && xF<dim[0] && yF<dim[1])
+			
 		{
+			
 			impbSelected.setRoi(x0,y0,boxSize,boxSize);
 			return impbSelected.crop().getProcessor();
 		}
 		else
 			return null;
 	}
+	
 	public boolean evaluateParticle(float xif, float yif)
 	{
 		ImageProcessor piece=cropParticle(impbFiltered,xif,yif);
@@ -125,6 +128,8 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		
 		parameter = (meanInside-meanOutside)/std;
 		return parameter>3;
+		
+		
 	}
 
 	public void addImage(ImageProcessor ipb1, ImageProcessor ipb2)
@@ -157,8 +162,8 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 
 	@SuppressWarnings("deprecation")
 	public void run(String arg) {
-		 ImagePlus imp = IJ.getImage();
-		 impInicial =imp.duplicate();
+		ImagePlus imp = IJ.getImage();
+		impInicial =imp.duplicate();
  		impOriginal=imp.duplicate();
  		int channelToExtract = 1;
  		int sliceToExtract=1;
@@ -168,8 +173,14 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 			 IJ.noImage();
  		if (!showDialog(imp))
  			return;
- 		if (impInicial.getStackSize() == 1)
+ 		if (impInicial.getStackSize() == 1) {
  			impb = impInicial;
+ 		if (impInicial.getType() == ImagePlus.COLOR_RGB) {
+ 	 		IJ.run(impInicial, "8-bit", "");
+ 	 		IJ.run(impInicial, "Grays", "");
+ 	 		impb=impInicial;
+ 		}
+ 	}
  		if (impInicial.getNChannels() > 1) { 
 		channelToExtract=channel;
  		impb = extractChannel(impInicial, channelToExtract);
@@ -189,7 +200,7 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		 channelToExtract=channel;
 		 impb =extractSliceChannel(impInicial, sliceToExtract, channelToExtract);
 		}
-		if(impInicial.getNChannels() > 1 && impInicial.getNSlices() > 1 && impInicial.getNFrames() > 1 && impInicial.getStackSize() > 1) {
+		if(impInicial.getNChannels() > 1 && impInicial.getNSlices() > 1  && impInicial.getNFrames() >  1 && impInicial.getStackSize() > 1){
 			 sliceToExtract=slice;
 			 channelToExtract=channel;
 			 frameToExtract=frame;
@@ -302,16 +313,15 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
  	 		imp.close();
  	 		imp.close();
  		}
- 		if(imp.getNChannels() > 1 && imp.getNSlices() > 1 && imp.getNFrames() > 1 &&  imp.getStackSize() > 1) {
+ 		if(imp.getNChannels() > 1 && imp.getNSlices() > 1 && imp.getNFrames() > 1 && imp.getStackSize() > 1) {
  			RoiManager rmFive = RoiManager.getInstance();
  			imp = IJ.getImage();
+ 			impbShow2.show();
  	 		IJ.run("From ROI Manager", "");
- 	 		ImagePlus imp2 = HyperStackConverter.toHyperStack(imp, imp.getNChannels(), imp.getNSlices(),imp.getNFrames(),"Color");
  	 		impOriginal.hide();
  	 		impInicial.hide();
- 	 		imp2.show();
- 	 		rmFive.runCommand(imp2,"Show All with labels");
- 	 		
+ 	 		rmFive.runCommand(impbShow2,"Show All with labels");
+ 	 		imp.close();
  		}
  		ic3 = new ImageConverter(impbSelected);
  		ic3.convertToGray8();
@@ -406,7 +416,6 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	}
 	
 	private ImagePlus extractChannel(ImagePlus imp, int channel) {
-
         int width = imp.getWidth();
         int height = imp.getHeight();
         int zslices = imp.getNSlices();
@@ -421,6 +430,7 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
                 int sliceOne = imp.getStackIndex(channel, z, t);
                 stack2.addSlice("", imp.getStack().getProcessor(sliceOne));
             }
+    	
         ColorModel cm = LookUpTable.createGrayscaleColorModel(false);
         stack2.setColorModel(cm);
         imp2.setStack(stack2);
@@ -468,6 +478,7 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		  ImageStack stack2 = new ImageStack(width, height);
 		  ImagePlus imp2 = new ImagePlus();
 		  imp2.setTitle("T" + frame + "-" + imp.getTitle());
+		 
 		  for (int z = 1; z <= zslices; z++)
 			  for (int c = 1; c <= channels; c++){
               int sliceSix = imp.getStackIndex(c, z, frame);
@@ -504,7 +515,6 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		  imp2.setFileInfo(fileInfo);
 		  return imp2;
 	}
-	
 	private ImagePlus extractSliceChannelFrame(ImagePlus imp, int slice, int channel, int frame) {
 		  int width    = imp.getWidth();
 		  int height   = imp.getHeight();
@@ -517,14 +527,13 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	      	  ByteProcessor  bp = cp.getChannel(channel, null);
 		  ImagePlus imp2 = new ImagePlus("C" + channel + "-" +"Z" + slice + "-"+"T" + frame + "-"+ imp.getTitle(), bp);
 		  int sliceFour = imp.getStackIndex(channel, slice, frame);
-	      	  stack2.addSlice("", imp.getStack().getProcessor(sliceFour));
+	      stack2.addSlice("", imp.getStack().getProcessor(sliceFour));
 	      ColorModel cm = LookUpTable.createGrayscaleColorModel(false);
 	      stack2.setColorModel(cm);
 		  imp2.setStack(stack2);
 		  imp2.setDimensions(1, 1, 1);
+		  imp2.setOpenAsHyperStack(true);
 		  imp2.setFileInfo(fileInfo);
 		  return imp2;
 	}
 }
-
-
