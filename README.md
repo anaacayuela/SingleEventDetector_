@@ -17,7 +17,7 @@ Select PSFDetector (ImageJ/Fiji ->Plugings -> PSFDetector).
 ## •STEP 3. 
 Fill the parameter gaps that appear in the GUI with your own data and try to establish a "(meanInside-meanOutside)/std" >3 for getting an accurate measure and press on "OK" button. The number of gaps depends on the digital image processing technique of your selected image.
 
-![Imagen1](https://user-images.githubusercontent.com/54528366/65891531-fb31d700-e3a4-11e9-9bb0-b3a47f4c47c7.png)
+![Imagen1](https://user-images.githubusercontent.com/54528366/67217831-aaeae980-f425-11e9-8785-f09a0f9c9979.png)
 
 ## •STEP 4.
 At this point, you will obtain a total of 3 images: 
