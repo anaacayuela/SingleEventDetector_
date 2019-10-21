@@ -2,7 +2,6 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.util.*;
 import java.awt.image.*;
-
 import ij.*;
 import ij.process.*;
 import ij.text.TextWindow;
@@ -107,7 +106,6 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		float varOutside=Math.max(0.0f, sum2Outside/Noutside-meanOutside*meanOutside);
 		pooledVar=((Ninside-1)*varInside+(Noutside-1)*varOutside)/(Ninside+Noutside);
 		std=(float)Math.sqrt(pooledVar);
-		
 		return (meanInside-meanOutside)/std;
 	}
 
@@ -133,7 +131,6 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	        }  
 	    }  		
 	}
-	
 	@SuppressWarnings("deprecation")
 	public void run(String arg) {
 		ImagePlus imp = IJ.getImage();
@@ -142,7 +139,6 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
  		int channelToExtract = 1;
  		int sliceToExtract=1;
  		int frameToExtract=1;
- 		
 		if (impInicial == null)
 			 IJ.noImage();
  		if (!showDialog(imp))
@@ -199,42 +195,33 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
  				"task=[Detect molecules and fit] psf=%f pixel=%d parallel=500 fitting=10 mark ignore",
  				stdParticle,pixelSize));
  		impb.hide();
- 		
- 		
  		ResultsTable RT = ResultsTable.getResultsTable(); 		
- 		
  		float [] x = RT.getColumn(0);
  		float [] y = RT.getColumn(1);
  		if (x==null)
  			return;
- 	
  		double [] coordZscore = new double[x.length];
  		drawParticleMask();
  		int Nok=0;
  		FloatProcessor ipPSF = new FloatProcessor(boxSize, boxSize);
  		for (int i=0; i<x.length; i++)
          	coordZscore[i]=evaluateParticle(x[i],y[i]);
-		
  		double [] coordZscoreSorted = new double[x.length];
  		System.arraycopy(coordZscore, 0, coordZscoreSorted, 0, coordZscore.length);
  		Arrays.sort(coordZscoreSorted);
  		double threshold=coordZscoreSorted[(int)((1-Math.max(Math.min(top,100),0)/100.0)*x.length)];
- 		
    		for (int i=0; i<x.length; i++)
      	{
  			 if(coordZscore[i]>threshold)
  			 {
  				OvalRoi oval = new OvalRoi((int)(x[i]-0.5*particleDiameter), (int)(y[i]-0.5*particleDiameter),
  						particleDiameter, particleDiameter);	
- 				
  				impbSelected.getProcessor().draw(oval);
  				int width =boxSize;
  				impbSelected.getProcessor().setLineWidth(width);
  				impbSelected.getProcessor().setColor(Color.RED);
   				addImage(ipPSF, cropParticle(impbSelected,x[i],y[i]));
  	 			Nok+=1;
- 	 			
-
  	 		    RoiManager manager = RoiManager.getInstance();
  	 		    if (manager == null)
  	 		        manager = new RoiManager();
@@ -320,9 +307,7 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
  		ic3.convertToGray8();
  		impbSelected.updateAndDraw();
 		impbSelected.hide();
-		
 		IJ.log(String.format("Number of selected spots: %d",Nok));
-
  		divideByConstant(ipPSF,Nok);
  		ImagePlus impPSF = new ImagePlus("Recorded Image of Single Particle",ipPSF);
  		ic2 = new ImageConverter(impPSF);
@@ -340,14 +325,12 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
         }
         for (int j=0; j<boxSize; j++)
         	psfProfile[j] /=psfMax;
-        
         CurveFitter cf = new CurveFitter(xPSF,psfProfile);
         cf.doFit(CurveFitter.GAUSSIAN);
         double []prms = cf.getParams();
         double std = prms[3];
         IJ.log(String.format("FWHM: %f nm",std*Math.sqrt(8*Math.log(2))*pixelSize));
       	IJ.log(String.format("R2: %f",cf.getFitGoodness()));
-      	
       	Plot plot = cf.getPlot(points);
       	plot.setXYLabels("Position (pixels)", "Normalized Intensity");
       	String labels ="GaussianFit\tPSFOriginal\t";
@@ -359,7 +342,6 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
  		Frame FR = WindowManager.getFrame("Results");
  		if (FR instanceof TextWindow) 
  			((TextWindow)FR).close(false);
- 		
 }
 	boolean showDialog(ImagePlus imp) {
 		GenericDialog gd = new GenericDialog("Single Event Detector");
@@ -406,29 +388,27 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	}
 	
 	private ImagePlus extractChannel(ImagePlus imp, int channel) {
-        int width = imp.getWidth();
-        int height = imp.getHeight();
-        int zslices = imp.getNSlices();
-        int frames = imp.getNFrames();
-        FileInfo fileInfo = imp.getOriginalFileInfo();
-        ImageStack stack2 = new ImageStack(width, height);
-        ColorProcessor cp = new ColorProcessor(imp.getImage());
-        ByteProcessor  bp = cp.getChannel(channel, null);
-        ImagePlus imp2 = new ImagePlus("C" + channel + "-" + imp.getTitle(), bp);
-        for (int t = 1; t <= frames; t++)
-            for (int z = 1; z <= zslices; z++) {
-                int sliceOne = imp.getStackIndex(channel, z, t);
-                stack2.addSlice("", imp.getStack().getProcessor(sliceOne));
+        	int width = imp.getWidth();
+       		int height = imp.getHeight();
+        	int zslices = imp.getNSlices();
+        	int frames = imp.getNFrames();
+        	FileInfo fileInfo = imp.getOriginalFileInfo();
+        	ImageStack stack2 = new ImageStack(width, height);
+       		ColorProcessor cp = new ColorProcessor(imp.getImage());
+        	ByteProcessor  bp = cp.getChannel(channel, null);
+        	ImagePlus imp2 = new ImagePlus("C" + channel + "-" + imp.getTitle(), bp);
+       		for (int t = 1; t <= frames; t++)
+            		for (int z = 1; z <= zslices; z++) {
+               			 int sliceOne = imp.getStackIndex(channel, z, t);
+               			 stack2.addSlice("", imp.getStack().getProcessor(sliceOne));
             }
-    	
-     
-        imp2.setStack(stack2);
-        imp2.setDimensions(1, zslices, frames);
-        if (zslices * frames > 1)
-            imp2.setOpenAsHyperStack(true);
-        imp2.setFileInfo(fileInfo);
-        imp2.updateAndDraw();
-        return imp2;
+        	imp2.setStack(stack2);
+        	imp2.setDimensions(1, zslices, frames);
+       		if (zslices * frames > 1)
+            		imp2.setOpenAsHyperStack(true);
+       		imp2.setFileInfo(fileInfo);
+       		imp2.updateAndDraw();
+        	return imp2;
 	}
 	private ImagePlus extractZSlice(ImagePlus imp, int slice) {
 		  int width    = imp.getWidth();
@@ -440,15 +420,16 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		  ImagePlus imp2 = new ImagePlus();
 		  imp2.setTitle("Z" + slice + "-" + imp.getTitle());
 		  for (int f = 1; f <= frames; f++)
-		    for (int c = 1; c <= channels; c++) {
-		      int sliceTwo = imp.getStackIndex(c, slice, f);
-		      stack2.addSlice("", imp.getStack().getProcessor(sliceTwo));
+		   	 for (int c = 1; c <= channels; c++) {
+		      		int sliceTwo = imp.getStackIndex(c, slice, f);
+		      		stack2.addSlice("", imp.getStack().getProcessor(sliceTwo));
 		    }
 		  imp2.setStack(stack2);
 		  imp2.setDimensions(channels, 1, frames);
 		  if (channels*frames > 1)
-		    imp2.setOpenAsHyperStack(true);
+		   	 imp2.setOpenAsHyperStack(true);
 		  imp2.setFileInfo(fileInfo);
+		  imp2.updateAndDraw();
 		  return imp2;
 		}
 	private ImagePlus extractTFrame(ImagePlus imp, int frame) {
@@ -461,17 +442,17 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 		  ImageStack stack2 = new ImageStack(width, height);
 		  ImagePlus imp2 = new ImagePlus();
 		  imp2.setTitle("T" + frame + "-" + imp.getTitle());
-		 
 		  for (int z = 1; z <= zslices; z++)
 			  for (int c = 1; c <= channels; c++){
-              int sliceSix = imp.getStackIndex(c, z, frame);
-              stack2.addSlice("", imp.getStack().getProcessor(sliceSix));
+              			int sliceSix = imp.getStackIndex(c, z, frame);
+             			stack2.addSlice("", imp.getStack().getProcessor(sliceSix));
           }
 		  imp2.setStack(stack2);
 		  imp2.setDimensions(channels,zslices ,1 );
 		  if (channels*zslices > 1)
-		    imp2.setOpenAsHyperStack(true);
+		   	 imp2.setOpenAsHyperStack(true);
 		  imp2.setFileInfo(fileInfo);
+		  imp2.updateAndDraw();
 		  return imp2;
 		}
 	private ImagePlus extractSliceChannel(ImagePlus imp, int slice, int channel) {
@@ -486,14 +467,15 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	     	  ByteProcessor  bp = cp.getChannel(channel, null);
 		  ImagePlus imp2 = new ImagePlus("C" + channel + "-" +"Z" + slice + "-"+ imp.getTitle(), bp);
 		  for (int f = 1; f <= frames; f++) {
-		      int sliceThree = imp.getStackIndex(channel, slice, f);
-		      stack2.addSlice("", imp.getStack().getProcessor(sliceThree));
+		         int sliceThree = imp.getStackIndex(channel, slice, f);
+		     	 stack2.addSlice("", imp.getStack().getProcessor(sliceThree));
 		  }
 	     
 		  imp2.setStack(stack2);
 		  imp2.setDimensions(1, 1, frames);
 		  if (frames > 1)
-		    imp2.setOpenAsHyperStack(true);
+		   	 imp2.setOpenAsHyperStack(true);
+		  imp2.updateAndDraw();
 		  imp2.setFileInfo(fileInfo);
 		  return imp2;
 	}
@@ -509,8 +491,7 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	      	  ByteProcessor  bp = cp.getChannel(channel, null);
 		  ImagePlus imp2 = new ImagePlus("C" + channel + "-" +"Z" + slice + "-"+"T" + frame + "-"+ imp.getTitle(), bp);
 		  int sliceFour = imp.getStackIndex(channel, slice, frame);
-	      stack2.addSlice("", imp.getStack().getProcessor(sliceFour));
-	     
+	     	  stack2.addSlice("", imp.getStack().getProcessor(sliceFour));
 		  imp2.setStack(stack2);
 		  imp2.setDimensions(1, 1, 1);
 		  imp2.setOpenAsHyperStack(true);
@@ -529,14 +510,14 @@ public class SingleEventDetector_  implements PlugIn, Measurements  {
 	     	  ByteProcessor  bp = cp.getChannel(channel, null);
 		  ImagePlus imp2 = new ImagePlus("C" + channel + "-" +"T" + frame + "-"+ imp.getTitle(), bp);
 		  for (int z = 1; z <= zslices; z++) {
-		      int sliceThree = imp.getStackIndex(channel, z, frame);
-		      stack2.addSlice("", imp.getStack().getProcessor(sliceThree));
+		     	 	int sliceThree = imp.getStackIndex(channel, z, frame);
+		      		stack2.addSlice("", imp.getStack().getProcessor(sliceThree));
 		  }
-	     
 		  imp2.setStack(stack2);
 		  imp2.setDimensions(1, zslices, 1);
 		  if (zslices > 1)
-		    imp2.setOpenAsHyperStack(true);
+			    imp2.setOpenAsHyperStack(true);
+	          imp2.updateAndDraw();
 		  imp2.setFileInfo(fileInfo);
 		  return imp2;
 	}
