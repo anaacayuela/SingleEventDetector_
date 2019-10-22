@@ -10,7 +10,7 @@ Open the image file you want to analyze through ImageJ/Fiji -> Open... .
 ![psf1](https://user-images.githubusercontent.com/54528366/65421950-63ad1100-de05-11e9-91a3-9d07f392fb62.png)
 
 ## •STEP 2.
-Select PSFDetector (ImageJ/Fiji ->Plugings -> PSFDetector).
+Select SingleEventDetector (ImageJ/Fiji ->Plugings -> SingleEventDetectorDetector).
 
 ![Imagen1](https://user-images.githubusercontent.com/54528366/65697710-a8da7880-e07b-11e9-8b0f-27b82616f5d9.png)
 
